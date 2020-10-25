@@ -9,7 +9,7 @@ Info: Course COP4634
 
 Included files:
 
-* myshell.cpp
+* mt-collatz.cpp
 * parse.cpp
 * parse.hpp
 * param.cpp
@@ -18,6 +18,8 @@ Included files:
 * execHandler.hpp
 * MAKEFILE
 * README.md
+* Report.pdf
+* Histogram.csv
 
 Compiling and running:
 From the command line, run `make` and then `./myshell`, and then provide your shell arguments to the shell utility prompt: `$$$`

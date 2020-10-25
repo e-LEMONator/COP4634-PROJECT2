@@ -7,7 +7,7 @@ CXX = c++
 CFLAGS = -std=c++11 -Wall 
 
 # main: parse execHandler
-# 	$(CXX) $(CFLAGS) -o myshell *.cpp 
+# 	$(CXX) $(CFLAGS) -o mt-collatz *.cpp 
 
 # execHandler: param
 # 	$(CXX) -c $(CFLAGS) -o execHandler.o execHandler.cpp
