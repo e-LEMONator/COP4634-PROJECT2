@@ -16,8 +16,8 @@ Info: Course COP4634
 * CollatzCalculator.cpp
 * MAKEFILE
 * README.md
-* Project 2 MT Collatz Report.pdf
-* Collatz Histogram.csv
+* Project 2 Report.pdf
+* Project 2 Analysis.xlsx
 
 ### Compiling and running:
 
