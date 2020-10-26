@@ -6,17 +6,11 @@
 CXX = c++
 CFLAGS = -std=c++11 -Wall 
 
-# main: parse execHandler
-# 	$(CXX) $(CFLAGS) -o mt-collatz *.cpp 
+main: spawner
+	$(CXX) $(CFLAGS) -o mt-collatz -lpthread -lrt -pthread *.cpp 
 
-# execHandler: param
-# 	$(CXX) -c $(CFLAGS) -o execHandler.o execHandler.cpp
+spawner:
+	$(CXX) $(CFLAGS) -c -o spawner.o CollatzSpawner.cpp
 
-# parse: param
-# 	$(CXX) -c $(CFLAGS) -o parse.o parse.cpp
-
-# param:
-# 	$(CXX) -c $(CFLAGS) -o param.o param.cpp
-
-# clean:
-# 	$(RM) *.o *.gch core myshell *.exe
+clean:
+	$(RM) *.o *.gch core mt-collatz *.exe
