@@ -6,6 +6,7 @@ CollatzSpawner::CollatzSpawner(int N, int T, bool noLock=false) {
     this->counter = 2;
     this->noLock = noLock;
 
+    // initialize map of frequencies to 0
     for (int i = 0; i <= MAX_STOPPING_ENTRIES; i++) {
         values.insert({i, 0});
     }
@@ -15,69 +16,59 @@ CollatzSpawner::CollatzSpawner(int N, int T, bool noLock=false) {
  * @brief Helper function to handle locking & unlocking mutex in a thread. Takes a callback function
  */
 template <typename Callback>
-void CollatzSpawner::handleLock(std::mutex& mut, const std::string& tID, const Callback& func) {
+void CollatzSpawner::handleLock(std::mutex& mut, const Callback& func) {
     if (noLock) {
+        // we don't want to use those fancy locks, we just want to run the code and be finished
         func();
         return;
     }
     while(true) {
-        // std::cout << "Thread " << tID << " checking for locks...\n";
+        // try to lock the mutex; if we can lock it, we know we have exclusive access
         if (mut.try_lock()) {
             func();
             mut.unlock();
-            // std::cout << "Unlocked mutex\n";
             break;
         }
     }
-    // func();
-    // mut.unlock();
 }
 
-void CollatzSpawner::threadCode(const std::string& tID) {
-    std::cout << "Thread " << tID << "\n";
+/**
+ * @brief Code that each Thread will run. Calculates a Collatz number & adds entries to map
+ */
+void CollatzSpawner::threadCode() {
     while (counter <= range) {
         // get the number we need to calculate
         int currentVal = 0;
-        // std::cout << "thread " << tID << " checking locks for currentLock...\n";
-        handleLock(currentLock, tID, [&]() {
+
+        // grab the value, increment for all . we need to lock it so that only we have access
+        handleLock(currentLock, [&]() {
             currentVal = counter;
             counter++;
         });
-        // std::cout << "thread " << tID << " working on value: " << currentVal << "\n"; 
         auto results = CollatzCalculator::collatz(currentVal);
-        // std::cout << "thread " << tID << " checking locks for mapLock...\n";
-        handleLock(mapLock, tID, [&]() {
-            // values.insert({results.first, results.second});
+        
+        // update map with results
+        handleLock(mapLock, [&]() {
             values.at(results.second)++;
         });
     }
-    std::cout << "thread " << tID << " reached end of threadCode\n";
-    // std::terminate();
 }
 
 std::map<int,int> CollatzSpawner::run() {
-    std::vector<std::thread> threads(threadCount); // I can't use arrays, I don't remember how. vectors are all I know
-    int t_counter = 0;
-    // for (auto& t : threads) {
-    //     std::cout << "Creating new thread..." << std::endl;
-    //     t = std::thread(&CollatzSpawner::threadCode, this, std::to_string(t_counter)); // start the thread
-    //     t.join(); // wait for all of the threads to finish
-    //     t_counter++;
-    // }
+    // I can't use arrays, I don't remember how. vectors are all I know
+    std::vector<std::thread> threads(threadCount); 
     for (size_t i = 0; i < threadCount; i++) {
-        threads.emplace(threads.begin()+i, std::thread(&CollatzSpawner::threadCode, this, std::to_string(t_counter)));
-        // threads.at(i).join();
-        t_counter++;
+        // we use emplace to construct the threads in place inside of the vector
+        threads.emplace(threads.begin()+i, std::thread(&CollatzSpawner::threadCode, this));
     }
-    // std::cout << "Size: " << threads.size() << std::endl;
-    for(size_t i = 0; i < threadCount; i++) {
+    
+    // the main thread will exit if we don't tell it not to. join all threads if they are joinable
+    for(int i = 0; i < threadCount; i++) {
         std::thread& t = threads.at(i);
-        // std::cout << "Joining threads...\n";
         if(!t.joinable()) {
-            std::cout << "Thread " << i << " is not joinable!\n";
+            throw "ERROR: Thread " + std::to_string(i) + " is not joinable!";
         } else {
             t.join();
-            // std::cout << "Joined thread " << i << "!\n";
         }
     }
     return values;

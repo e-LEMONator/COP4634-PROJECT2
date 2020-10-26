@@ -4,10 +4,9 @@
 
 #include "CollatzCalculator.hpp"
 
-#include <iostream>
 #include <map>      // std::map
 #include <mutex>    // std::mutex
-#include <string>
+#include <string>   // std::string
 #include <thread>   // std::thread
 #include <utility>  // std::pair
 #include <vector>   // std::vector
@@ -23,9 +22,9 @@ class CollatzSpawner {
         std::mutex currentLock;
         std::mutex mapLock;
         std::map<int,int> values;
-        void threadCode(const std::string&);
+        void threadCode();
         template<typename Callback>
-        void handleLock(std::mutex&, const std::string&, const Callback&);
+        void handleLock(std::mutex&, const Callback&);
     public:
         CollatzSpawner(int N, int T, bool noLock);
         std::map<int,int> run();
