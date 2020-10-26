@@ -21,9 +21,11 @@ void CollatzSpawner::handleLock(std::mutex& mut, const std::string& tID, const C
         return;
     }
     while(true) {
+        // std::cout << "Thread " << tID << " checking for locks...\n";
         if (mut.try_lock()) {
             func();
             mut.unlock();
+            // std::cout << "Unlocked mutex\n";
             break;
         }
     }
@@ -36,17 +38,21 @@ void CollatzSpawner::threadCode(const std::string& tID) {
     while (counter <= range) {
         // get the number we need to calculate
         int currentVal = 0;
+        // std::cout << "thread " << tID << " checking locks for currentLock...\n";
         handleLock(currentLock, tID, [&]() {
             currentVal = counter;
             counter++;
         });
+        // std::cout << "thread " << tID << " working on value: " << currentVal << "\n"; 
         auto results = CollatzCalculator::collatz(currentVal);
+        // std::cout << "thread " << tID << " checking locks for mapLock...\n";
         handleLock(mapLock, tID, [&]() {
             // values.insert({results.first, results.second});
             values.at(results.second)++;
         });
     }
-    std::terminate();
+    std::cout << "thread " << tID << " reached end of threadCode\n";
+    // std::terminate();
 }
 
 std::map<int,int> CollatzSpawner::run() {
@@ -63,13 +69,15 @@ std::map<int,int> CollatzSpawner::run() {
         // threads.at(i).join();
         t_counter++;
     }
-    std::cout << "Size: " << threads.size() << std::endl;
+    // std::cout << "Size: " << threads.size() << std::endl;
     for(size_t i = 0; i < threadCount; i++) {
         std::thread& t = threads.at(i);
+        // std::cout << "Joining threads...\n";
         if(!t.joinable()) {
             std::cout << "Thread " << i << " is not joinable!\n";
         } else {
             t.join();
+            // std::cout << "Joined thread " << i << "!\n";
         }
     }
     return values;
