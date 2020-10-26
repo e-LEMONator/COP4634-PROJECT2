@@ -22,7 +22,7 @@ fi
 
 for i in {1..30}
 do
-	for j in {1..20}
+	for j in {1..10}
 	do
 		./$name $collatz $i -nolock > $CWD/$output/cout/values-$i-$j.out 2> $CWD/$output/cerr/time-$i-$j.out
 		echo "Finished iteration $j with threadCount $i"
