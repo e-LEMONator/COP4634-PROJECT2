@@ -13,7 +13,10 @@
 				"${fileDirname}/${fileBasenameNoExtension}.exe",
 				"*.cpp",
                 "*.hpp",
-                "-D DEBUG"
+                "-D DEBUG",
+                "-lpthread",
+                "-pthread",
+                "-lrt"
             ],
             // "command": "make clean && make",
             "options": {
