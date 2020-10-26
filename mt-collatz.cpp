@@ -36,6 +36,7 @@ int main(int argc, char** args) {
         printUsage();
         exit(3);
     }
+
     // Collatz number
     int N;
     
@@ -43,7 +44,9 @@ int main(int argc, char** args) {
     int T;
 
     // is -nolock in the args?
-    bool noLock = argc >= 3 && args[3] == "-nolock"; 
+    bool noLock = argc >= 3 && args[3][0] == '-'; 
+
+    std::cout << "noLock: " << (noLock ? "True" : "False") << "\n";
 
     try {
         N = argToInt(args[1]);
@@ -61,9 +64,11 @@ int main(int argc, char** args) {
     // start timer
     clock_gettime(CLOCK_REALTIME, &start);
 
+    std::map<int,int> results;
+
     try {
         // run the Collatz calculations
-        auto results = spawner.run();
+        results = spawner.run();
     } catch (const char* err) {
         std::cerr << err << std::endl;
         exit(4);
